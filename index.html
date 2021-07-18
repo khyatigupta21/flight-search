@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <style>
+        body {font-family: Arial;}
+
+        /* Style the tab */
+        .tab {
+          overflow: hidden;
+          border: 1px solid #ccc;
+          background-color: #f1f1f1;
+        }
+
+        /* Style the buttons inside the tab */
+        .tab button {
+          background-color: inherit;
+          float: left;
+          border: none;
+          outline: none;
+          cursor: pointer;
+          padding: 14px 16px;
+          transition: 0.3s;
+          font-size: 17px;
+        }
+
+        /* Change background color of buttons on hover */
+        .tab button:hover {
+          background-color: #ddd;
+        }
+
+        /* Create an active/current tablink class */
+        .tab button.active {
+          background-color: #ccc;
+        }
+
+        /* Style the tab content */
+        .tabcontent {
+          display: none;
+          padding: 6px 12px;
+          border: 1px solid #ccc;
+          border-top: none;
+        }
+
+        .tab-inputs {
+          float: left;
+          width: 75%;
+          margin-top: 6px;
+        }
+      </style>
+    </head>
+
+    <body>
+    <h2>Flight Search</h2>
+    <p>Please search for the flight</p>
+
+    <div class="tab">
+      <button class="tablinks" onclick="openCity(event, 'OneWay')" id="defaultOpen">One Way</button>
+      <button class="tablinks" onclick="openCity(event, 'RoundTrip')">Round Trip</button>
+    </div>
+
+    <div id="OneWay" class="tabcontent">
+      <div class="tab-inputs">
+          <input type="text" id="fromLocation" placeholder="From" onkeyup="flight.airportAutoSuggestion(event)"/>
+      </div>
+      <div class="tab-inputs">
+          <input type="text" id="toLocation" placeholder="To" onkeyup="flight.airportAutoSuggestion(event)"/>
+      </div>
+      <div class="tab-inputs">
+          <input type="text" id="travelDate" placeholder="Travel Date" onchange="flight.validateEnteredDate(event)" onfocus="(this.type='date')"/>
+      </div>
+      <div class="tab-inputs">
+          <input type="number"  id="noOfTravelers" onchange="flight.validateTravelers(event)" min="1" max="8" placeholder="Number of Travelers"/>
+      </div>
+      <div class="tab-inputs" >
+          <input id="searchBtn" type="button" onclick="flight.submitValues(event)" value="Submit"/>
+      </div>
+    </div>
+
+    <div id="RoundTrip" class="tabcontent">
+      <div class="tab-inputs">
+          <input type="text" id="fromLocation" placeholder="From" onkeyup="flight.airportAutoSuggestion(event)"/>
+      </div>
+      <div class="tab-inputs">
+          <input type="text" id="toLocation" placeholder="To" onkeyup="flight.airportAutoSuggestion(event)"/>
+      </div>
+      <div class="tab-inputs">
+          <input type="text" id="travelDate" placeholder="Travel Date" onchange="flight.validateEnteredDate(event)" onfocus="(this.type='date')"/>
+      </div>
+      <div class="tab-inputs">
+          <input type="text" id="returnDate" placeholder="Return Date" onchange="flight.validateEnteredDate(event)" onfocus="(this.type='date')"/>
+      </div>
+      <div class="tab-inputs">
+          <input type="number"  id="noOfTravelers" onchange="flight.validateTravelers(event)" min="1" max="8" placeholder="Number of Travelers"/>
+      </div>
+      <div class="tab-inputs" >
+          <input id="searchBtn" type="button" onclick="flight.submitValues(event)" value="Submit"/>
+      </div>
+    </div>
+
+
+
+    <script>
+      document.getElementById("defaultOpen").click();
+
+      //Airport list//
+      const searchAirport = [
+        {
+          location: "Mumbai (BOM)",
+          keyword: ["Mumbai", "BOM", "Mumbai (BOM)"],
+        },
+        {
+          location: "Delhi (DEL)",
+          keyword: ["Delhi", "DEL", "Delhi (DEL)"],
+        },
+        {
+          location: "Chennai (MAA)",
+          keyword: ["Chennai", "MAA", "Chennai (MAA)"],
+        },
+        {
+          location: "Hyderabad (HYD)",
+          keyword: ["Hyderabad", "HYD", "Hyderabad (HYD)"],
+        },
+        {
+          location: "Pune (PNQ)",
+          keyword: ["Pune", "PNQ", "Pune (PNQ)"],
+        },
+        {
+          location: "Bangalore (BLR)",
+          keyword: ["Bangalore", "BLR", "Bangalore (BLR)"],
+        },
+      ];
+
+      /* Airlines Array list */
+      const airlines = ["SpiceJet", "Indigo", "Air India", "GoAir"];
+
+      let flights = [
+        {
+          "from":"BOM",
+          "to":"DEL"
+          "FlightName":"SpiceJet"
+          "depTime":"1:05 AM",
+          "arrTime":"2:05 AM",
+          "fare":"2000"
+
+        },
+        {
+          "from":"BOM",
+          "to":"BLR",
+          "FlightName":"Air India"
+          "depTime":"17:00 PM",
+          "arrTime":"19:00 PM",
+          "fare":"1900"
+
+        },
+        {
+          "from":"DEL",
+          "to":"MAA",
+          "FlightName":"SpiceJet"
+          "deptTime":"3:05 AM",
+          "arrivalTime":"5:00AM",
+          "fare":"2100"
+        },
+        {
+          "from":"DEL",
+          "to":"BLR",
+          "FlightName":"Indigo"
+          "deptTime":"19:00 PM",
+          "arrivalTime":"21:00PM",
+          "fare":"2000"
+
+        },
+        {
+          "from":"MAA",
+          "to":"BOM",
+          "FlightName":"Indigo"
+          "deptTime":"12:05 PM"
+          "arrivalTime":"14:30 PM",
+          "fare":"3000"
+        },
+        {
+          "from":"MAA",
+          "to":"DEL",
+          "FlightName":"Air India"
+          "deptTime":"6:00 AM"
+          "arrivalTime":"8:00 AM",
+          "fare":"2900"
+        },
+        {
+          "from":"MAA",
+          "to":"BLR",
+          "FlightName":"SpiceJet"
+          "deptTime":"20:00 PM"
+          "arrivalTime":"22:10 PM",
+          "fare":"3500"
+        },
+        {
+          "from":"PNQ",
+          "to":"DEL",
+          "FlightName":"SpiceJet"
+          "depTime":"1:05 AM",
+          "arrTime":"2:05 AM",
+          "fare":"2000"
+
+        },
+        {
+          "from":"PNQ",
+          "to":"MAA",
+          "FlightName":"Indigo"
+          "depTime":"12:05 PM",
+          "arrTime":"14:05 PM",
+          "fare":"2000"
+
+        },
+        {
+          "from":"BLR",
+          "to":"DEL",
+          "FlightName":"SpiceJet"
+          "depTime":"8:00 AM",
+          "arrTime":"10:00 AM",
+          "fare":"2000"
+
+        },
+        {
+          "from":"BLR",
+          "to":"BOM",
+          "FlightName":"Air India"
+          "depTime":"18:00 PM",
+          "arrTime":"20:00 PM",
+          "fare":"2000"
+
+        }
+      ]
+
+      
+    </script>
+  </body>
+</html>
